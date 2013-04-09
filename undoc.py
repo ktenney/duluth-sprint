@@ -2,8 +2,7 @@
 import os
 import re
 
-loaddir = g.computeLoadDir()
-loaddir = os.path.dirname(loaddir)
+loaddir = g.computeLeoDir()
 
 pattern = re.compile(r"""\.doHook\s*\(\s*['"]([^'"]+)['"]""")
 
@@ -31,8 +30,16 @@ for line in docs:
     if not line:
         break
     doced.add(line.split()[0].strip('"\'\\'))
+    
+print("\nUNDOCUMENTED HOOKS")
 for hook in sorted(hooks):
     if hook not in doced:
-        print hook, hooks[hook]
+        path, line = hooks[hook]
+        path = path.replace(loaddir, '').strip('/')
+        print("%s %s:%s" % (hook, path, line))
 
-    
+print("\nDOCUMENTED HOOKS NOT FOUND IN SOURCE")
+for hook in sorted(doced):
+    if hook not in hooks:
+        print(hook)
+
